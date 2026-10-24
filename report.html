@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ridgeline Schools Weather Network — Spring Health Report</title>
+<style>
+  /* ── base ──────────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', serif;
+    font-size: 11pt;
+    line-height: 1.55;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 28px 48px;
+  }
+  @media print {
+    body { max-width: 100%; padding: 12mm 14mm; font-size: 10pt; }
+    .no-print { display: none; }
+    h1 { font-size: 18pt; }
+    h2 { font-size: 13pt; }
+  }
+
+  /* ── header ─────────────────────────────────────────────────────────── */
+  .masthead {
+    border-bottom: 3px solid #1a3a5c;
+    padding-bottom: 10px;
+    margin-bottom: 22px;
+  }
+  .masthead h1 {
+    font-size: 19pt;
+    color: #1a3a5c;
+    font-weight: bold;
+    letter-spacing: -0.3px;
+  }
+  .masthead .subtitle {
+    font-size: 10pt;
+    color: #555;
+    margin-top: 3px;
+  }
+
+  /* ── section headings ────────────────────────────────────────────────── */
+  h2 {
+    font-size: 12.5pt;
+    color: #1a3a5c;
+    margin: 26px 0 10px;
+    border-left: 4px solid #e05c00;
+    padding-left: 9px;
+  }
+  h3 {
+    font-size: 10.5pt;
+    margin: 14px 0 6px;
+    color: #333;
+  }
+
+  /* ── intro paragraph ────────────────────────────────────────────────── */
+  .intro { color: #333; margin-bottom: 18px; }
+
+  /* ── question callout boxes ─────────────────────────────────────────── */
+  .question-box {
+    background: #f4f7fb;
+    border: 1px solid #c2d0e0;
+    border-radius: 5px;
+    padding: 12px 15px;
+    margin-bottom: 18px;
+  }
+  .question-box .q-label {
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: #e05c00;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 4px;
+  }
+  .question-box .q-answer {
+    font-size: 11.5pt;
+    font-weight: bold;
+    color: #1a3a5c;
+  }
+
+  /* ── station status table ────────────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin: 10px 0 20px;
+  }
+  th {
+    background: #1a3a5c;
+    color: #fff;
+    text-align: left;
+    padding: 6px 8px;
+    font-weight: normal;
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 5px 8px;
+    vertical-align: top;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  tr:nth-child(even) td { background: #f9f9f9; }
+
+  /* ── traffic-light badges ───────────────────────────────────────────── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 8pt;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  .green  { background: #d4edda; color: #155724; }
+  .amber  { background: #fff3cd; color: #856404; }
+  .red    { background: #f8d7da; color: #721c24; }
+  .grey   { background: #e2e3e5; color: #383d41; }
+
+  /* ── findings list ───────────────────────────────────────────────────── */
+  .findings { margin: 0 0 4px 0; padding-left: 16px; }
+  .findings li { margin-bottom: 3px; }
+  .finding-none { color: #888; font-style: italic; font-size: 9pt; }
+
+  /* ── technician recommendation box ──────────────────────────────────── */
+  .recommendation {
+    background: #fff8f0;
+    border: 2px solid #e05c00;
+    border-radius: 6px;
+    padding: 14px 17px;
+    margin: 14px 0 20px;
+  }
+  .recommendation .rec-station {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #e05c00;
+  }
+  .recommendation .rec-why {
+    margin-top: 6px;
+    color: #333;
+  }
+  .rec-tasks { margin: 10px 0 0 16px; }
+  .rec-tasks li { margin-bottom: 4px; }
+
+  /* ── channel status grid ─────────────────────────────────────────────── */
+  .channel-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 4px 0;
+  }
+  .ch-pill {
+    font-size: 7.5pt;
+    padding: 1px 6px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #444;
+  }
+  .ch-pill.ok     { border-color: #6ec07e; background: #eafaf0; color: #1a5c2a; }
+  .ch-pill.issue  { border-color: #e8a070; background: #fff3ed; color: #7a3000; }
+  .ch-pill.bad    { border-color: #d97a7a; background: #fdeaea; color: #6b1c1c; }
+
+  /* ── footnote ────────────────────────────────────────────────────────── */
+  .footnote {
+    font-size: 8pt;
+    color: #888;
+    margin-top: 30px;
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ MASTHEAD ════════════════════════ -->
+<div class="masthead">
+  <h1>Ridgeline Schools Weather Network</h1>
+  <div class="subtitle">Network Health Report &nbsp;·&nbsp; Data period: 1 March – 11 April 2025 &nbsp;·&nbsp; 8 stations</div>
+</div>
+
+<p class="intro">
+  This report summarises six weeks of data from the volunteer network.
+  Every station has been checked automatically for sensor faults, clock errors,
+  data gaps, and implausible readings. The findings below are written for the
+  coordinator; the full list of flagged intervals is in <code>flags.csv</code>.
+</p>
+
+<!-- ════════════════ QUESTION 1: WHICH DATA IS USABLE? ════════════════ -->
+<h2>1 &nbsp; Which data is good enough for the spring climate summary?</h2>
+
+<div class="question-box">
+  <div class="q-label">Bottom line</div>
+  <div class="q-answer">
+    Five stations (S01, S02*, S07*, S08, S05*) can contribute usable data
+    for most channels. Two stations (S03, S06*) need significant repair
+    before their data can be trusted. S04 rain data must be excluded for
+    most of March–April.
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Station</th>
+      <th>Name</th>
+      <th>Overall</th>
+      <th>Issues found</th>
+      <th>Channels usable?</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr>
+      <td><strong>S01</strong></td>
+      <td>Saddle Ridge Hut (2913 m)</td>
+      <td><span class="badge green">Good</span></td>
+      <td class="finding-none">No issues detected.</td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill ok">temp</span>
+          <span class="ch-pill ok">humidity</span>
+          <span class="ch-pill ok">pressure</span>
+          <span class="ch-pill ok">wind</span>
+          <span class="ch-pill ok">rain</span>
+          <span class="ch-pill ok">sun</span>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>S02</strong></td>
+      <td>North Mesa School (1623 m)</td>
+      <td><span class="badge amber">Correctable</span></td>
+      <td>
+        <ul class="findings">
+          <li>Pressure board swapped uncalibrated on 21 Mar (~11 am).
+              Pressure reads <strong>+7.8 hPa too high</strong> from 20 Mar onward.</li>
+        </ul>
+      </td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill ok">temp</span>
+          <span class="ch-pill ok">humidity</span>
+          <span class="ch-pill issue">pressure*</span>
+          <span class="ch-pill ok">wind</span>
+          <span class="ch-pill ok">rain</span>
+          <span class="ch-pill ok">sun</span>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>S03</strong></td>
+      <td>Valley Library (1523 m)</td>
+      <td><span class="badge red">Poor</span></td>
+      <td>
+        <ul class="findings">
+          <li><strong>Temperature sensor unreliable</strong>: two 85 °C spikes
+              (sensor reset artifact), two −40 °C spikes, and an 80-hour
+              freeze at exactly 6.5 °C (17 Mar – 21 Mar).</li>
+        </ul>
+      </td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill bad">temp ✗</span>
+          <span class="ch-pill ok">humidity</span>
+          <span class="ch-pill ok">pressure</span>
+          <span class="ch-pill ok">wind</span>
+          <span class="ch-pill ok">rain</span>
+          <span class="ch-pill ok">sun</span>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>S04</strong></td>
+      <td>Foothills Community Garden (1763 m)</td>
+      <td><span class="badge amber">Partial</span></td>
+      <td>
+        <ul class="findings">
+          <li>Rain gauge funnel blocked by leaves and a bird nest.
+              Missed <strong>~30 mm</strong> on 29–30 Mar while all other
+              stations recorded heavy rain. A 33.8 mm dump on 2 Apr
+              (clean-out day) should also be excluded.</li>
+        </ul>
+      </td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill ok">temp</span>
+          <span class="ch-pill ok">humidity</span>
+          <span class="ch-pill ok">pressure</span>
+          <span class="ch-pill ok">wind</span>
+          <span class="ch-pill bad">rain ✗</span>
+          <span class="ch-pill ok">sun</span>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>S05</strong></td>
+      <td>Eastside Rec Centre (1644 m)</td>
+      <td><span class="badge amber">Correctable</span></td>
+      <td>
+        <ul class="findings">
+          <li>Humidity sensor <strong>pegged above 100 %</strong> for 77 hours
+              (7 Mar 19:10 – 11 Mar 00:10) during sunny weather — flagged by
+              school children on 10 Mar. Sensor recovered; all other channels clean.</li>
+          <li>GPS coordinates in the install sheet differ from GPS fix by
+              20 km — likely a decimal-degree transcription error.
+              Station location is not in doubt.</li>
+        </ul>
+      </td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill ok">temp</span>
+          <span class="ch-pill issue">humidity*</span>
+          <span class="ch-pill ok">pressure</span>
+          <span class="ch-pill ok">wind</span>
+          <span class="ch-pill ok">rain</span>
+          <span class="ch-pill ok">sun</span>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>S06</strong></td>
+      <td>South Hills Fire Station (1891 m)</td>
+      <td><span class="badge red">Clock error</span></td>
+      <td>
+        <ul class="findings">
+          <li>Battery went flat; logger was rebooted on 24 Mar.
+              The clock <strong>reset to local time (MDT) instead of UTC</strong>,
+              so every timestamp from 24 Mar onward is <strong>6 hours behind</strong>
+              the true UTC time. Confirmed independently by GPS.</li>
+          <li>Adds a duplicate block of timestamps (rows 3409–3444)
+              at the moment of clock reset.</li>
+          <li>Data ends at logger-time 17:50 on 11 Apr = real 23:50 UTC
+              (6-hour offset).</li>
+        </ul>
+      </td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill issue">all*</span>
+        </div>
+        <div style="font-size:8pt;color:#7a3000;margin-top:3px;">
+          All channels after 24 Mar need a +6h timestamp correction before use.
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>S07</strong></td>
+      <td>Riverbend Farm (1525 m)</td>
+      <td><span class="badge amber">Partial</span></td>
+      <td>
+        <ul class="findings">
+          <li>Anemometer cups cracked; replaced 26 Mar with a different brand.
+              Daily mean wind speed <strong>dropped 74 %</strong> immediately
+              (from ~10 km/h to ~2 km/h) while all other stations show no change.
+              The new anemometer uses a different calibration factor.</li>
+        </ul>
+      </td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill ok">temp</span>
+          <span class="ch-pill ok">humidity</span>
+          <span class="ch-pill ok">pressure</span>
+          <span class="ch-pill bad">wind ✗</span>
+          <span class="ch-pill ok">rain</span>
+          <span class="ch-pill ok">sun</span>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>S08</strong></td>
+      <td>Plains Grange Hall (1437 m)</td>
+      <td><span class="badge amber">Gaps</span></td>
+      <td>
+        <ul class="findings">
+          <li><strong>35-hour data gap</strong> (16 Mar 13:50 – 18 Mar 01:40)
+              when the SIM data plan ran out.</li>
+          <li>A full duplicate copy of 5 Apr data is appended after 11 Apr
+              (rows 5835–5978). The website showed "the same day twice"
+              on 5 Apr — this is the cause.</li>
+        </ul>
+      </td>
+      <td>
+        <div class="channel-grid">
+          <span class="ch-pill ok">temp</span>
+          <span class="ch-pill ok">humidity</span>
+          <span class="ch-pill ok">pressure</span>
+          <span class="ch-pill ok">wind</span>
+          <span class="ch-pill ok">rain</span>
+          <span class="ch-pill ok">sun</span>
+        </div>
+        <div style="font-size:8pt;color:#555;margin-top:3px;">
+          Gaps noted. Usable data outside the gap period.
+        </div>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+<p style="font-size:8.5pt;color:#555;">
+  <strong>Key:</strong>
+  <span class="badge green">Good</span> = all channels usable &nbsp;
+  <span class="badge amber">Correctable / Partial</span> = usable with noted exclusions &nbsp;
+  <span class="badge red">Poor / Clock error</span> = significant repair needed &nbsp;
+  * = correctable by applying the offset from <code>flags.csv</code>
+</p>
+
+
+<!-- ════════════════ QUESTION 2: WHERE TO SEND THE TECHNICIAN? ════════════════ -->
+<h2>2 &nbsp; Where should the technician go next week?</h2>
+
+<div class="recommendation">
+  <div class="rec-station">S06 &mdash; South Hills Fire Station</div>
+  <div class="rec-why">
+    The logger clock is running 6 hours behind UTC since 24 March (battery swap).
+    This corrupts <em>all</em> six channels for the last 18 days of the record —
+    temperature, humidity, pressure, wind, rain, and GHI are all time-stamped
+    wrongly. No amount of software correction is reliable without someone
+    physically confirming the current clock state, the battery, and the GPS lock.
+  </div>
+  <ul class="rec-tasks">
+    <li><strong>Check first:</strong> Is the logger clock still showing local time, or has GPS re-synced it?
+        Read the display before touching anything.</li>
+    <li>Force a GPS re-sync if available, or manually set to UTC.</li>
+    <li>Inspect the battery / solar charge — a flat battery was the root cause.</li>
+    <li>Verify GPS indicator light is active (confirms ongoing clock discipline).</li>
+    <li>Note the exact correction time for retrospective data patching.</li>
+  </ul>
+</div>
+
+<h3>Why not S03 instead?</h3>
+<p>
+  S03 (Valley Library) has a faulty temperature sensor — multiple 85 °C spikes,
+  −40 °C spikes, and an 80-hour freeze — but its other five channels are clean.
+  The pattern (85 °C is the DS18B20 sensor's power-on error code) suggests the
+  probe needs replacement, not the logger. That repair takes more than an hour
+  and requires a spare probe. S06's clock issue affects <em>every</em> channel
+  and can be resolved in a single visit with no parts.
+</p>
+<p style="margin-top:8px;">
+  <strong>Recommended second visit (future):</strong>
+  S03 for temperature probe replacement; S07 for anemometer recalibration
+  (new brand, wind reading ~74 % too low); S04 to inspect the rain gauge
+  mounting for debris.
+</p>
+
+
+<!-- ════════════════ FOOTNOTE ════════════════ -->
+<p class="footnote">
+  Checker run: automated analysis of 6-week data pack, 8 stations, 48 048 readings. &nbsp;
+  All flags and evidence in <code>flags.csv</code>. &nbsp;
+  Prepared for the Ridgeline Schools Weather Network spring 2025 review.
+</p>
+
+</body>
+</html>
