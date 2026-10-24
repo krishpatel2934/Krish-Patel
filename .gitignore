@@ -1,0 +1,28 @@
+# Data pack (do NOT commit)
+data/
+gps/
+stations.csv
+maintenance_log.md
+*.pdf
+
+# Virtual environment
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
