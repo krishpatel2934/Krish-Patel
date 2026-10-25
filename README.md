@@ -1,6 +1,6 @@
 ## Krish Patel
 ## Email : krishpatel2934@gmail.com
-## Video: [YouTube/Drive link — add before submission]
+## Video: https://drive.google.com/file/d/1eckdioBdA6V5Fcv2H95WzIDg-sL3mxCt/view?usp=sharing
 ## Run: python -m checker <data_pack_folder>
 
 ## Ridgeline Schools Weather Network — Data Quality Checker
